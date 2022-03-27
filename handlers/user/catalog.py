@@ -9,7 +9,6 @@ from loader import dp, db, bot
 from .menu import catalog
 from filters import IsUser
 
-
 @dp.message_handler(IsUser(), text=catalog)
 async def process_catalog(message: Message):
     await message.answer('Выберите раздел, чтобы вывести список товаров:',
@@ -36,6 +35,7 @@ async def add_product_callback_handler(query: CallbackQuery, callback_data: dict
 
     await query.answer('Товар добавлен в корзину!')
     await query.message.delete()
+    
 
 
 async def show_products(m, products):

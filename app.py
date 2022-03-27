@@ -18,7 +18,7 @@ admin_message = 'Админ'
 
 @dp.message_handler(commands='start')
 async def cmd_start(message: types.Message):
-
+    print(config.ADMINS)
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     cid = message.chat.id

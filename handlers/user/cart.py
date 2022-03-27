@@ -9,7 +9,7 @@ from states import CheckoutState
 from loader import dp, db, bot
 from filters import IsUser
 from .menu import cart
-
+from data import config
 
 @dp.message_handler(IsUser(), text=cart)
 async def process_cart(message: Message, state: FSMContext):
@@ -144,7 +144,7 @@ async def process_check_cart_back(message: Message, state: FSMContext):
 @dp.message_handler(IsUser(), text=all_right_message, state=CheckoutState.check_cart)
 async def process_check_cart_all_right(message: Message, state: FSMContext):
     await CheckoutState.next()
-    await message.answer('Укажите свое имя.',
+    await message.answer('Укажите номер телефона.',
                          reply_markup=back_markup())
 
 
@@ -178,7 +178,7 @@ async def process_address_back(message: Message, state: FSMContext):
 
     async with state.proxy() as data:
 
-        await message.answer('Изменить имя с <b>' + data['name'] + '</b>?',
+        await message.answer('Изменить номер телефона с <b>' + data['name'] + '</b>?',
                              reply_markup=back_markup())
     await CheckoutState.name.set()
 
@@ -229,9 +229,15 @@ async def process_confirm(message: Message, state: FSMContext):
             products = [idx + '=' + str(quantity)
                         for idx, quantity in db.fetchall('''SELECT idx, quantity FROM cart
             WHERE cid=?''', (cid,))]  # idx=quantity
-            print(data)
+            print('data=', data['products'])
+            adminmessage = 'Новый заказ:\n Тел: ' + data['name'] + '\n'
+            for product in data['products'].values():
+                adminmessage+=product[0] + ' - ' + str(product[1]) + ' - '+ str(product[2]) + '\n'
+            print(adminmessage, data, product)
+            for chat in config.ADMINS:
+                await bot.send_message(chat_id=chat, text=adminmessage)
             db.query('INSERT INTO orders VALUES (?, ?, ?, ?)',
-                     (cid, data['name'], data['address'], ' '.join(products)))
+                     (cid, data['name'], data['address'], adminmessage))
 
             db.query('DELETE FROM cart WHERE cid=?', (cid,))
 

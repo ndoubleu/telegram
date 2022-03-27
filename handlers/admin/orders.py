@@ -20,3 +20,11 @@ async def order_answer(message, orders):
         res += f'Заказ <b>№{order[3]}</b>\n\n'
 
     await message.answer(res)
+
+
+    # res = ''
+
+    # for order in orders:
+    #     await message.answer(f'Заказ <b>{order[3]}</b>')
+
+    # await message.answer(res)
